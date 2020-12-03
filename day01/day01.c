@@ -35,13 +35,6 @@ int solve2() {
 }
 
 int main(int argc, char ** args) {
-    int result = solve2();
-    if (argc > 1) {
-        printf("%s", args[1]);
-        printf("%i", args[1] == "1");
-        if (args[1] == "1") {
-            result = solve1();
-        }
-    }
-    printf("%d\n", result);
+    printf("Part 1: %d\n", solve1());
+    printf("Part 2: %d\n", solve2());
 }
