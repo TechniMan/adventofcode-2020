@@ -41,7 +41,7 @@ int countOccurrences(char chr, char * password) {
     return count > 0 ? count : count - 1;
 }
 
-int countValidPasswords() {
+int solve1() {
     int count = 0;
 
     for (int a = 0; a < inputLength; a++) {
@@ -53,6 +53,23 @@ int countValidPasswords() {
         }
 
         //printf("Policy: %d-%d %c; Password: %s; Occurrences: %d\n", pap.min, pap.max, pap.chr, pap.password, occurrences);
+    }
+
+    return count;
+}
+
+int solve2() {
+    int count = 0;
+
+    for (int a = 0; a < inputLength; a++) {
+        PolicyAndPassword pap = input[a];
+
+        if ((pap.password[pap.min - 1] == pap.chr &&
+            pap.password[pap.max - 1] != pap.chr) ||
+            (pap.password[pap.min - 1] != pap.chr &&
+            pap.password[pap.max - 1] == pap.chr)) {
+            count++;
+        }
     }
 
     return count;
@@ -70,5 +87,6 @@ int main(int argc, char ** args) {
     }
 
     // solve the puzzle
-    printf("Part 1: %d\n", countValidPasswords());
+    printf("Part 1: %d\n", solve1());
+    printf("Part 2: %d\n", solve2());
 }
