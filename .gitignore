@@ -13,5 +13,7 @@ Cargo.lock
 # Added by cargo
 /target
 
-# 'Xecutables built in C should end in .x to be ignored
-*.x
+# Ignore everything; unignore dirs; unignore files w/ extensions
+*
+!*/
+!*.*
