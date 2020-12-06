@@ -13,7 +13,10 @@ Cargo.lock
 # Added by cargo
 /target
 
+# To ignore files without extensions;
 # Ignore everything; unignore dirs; unignore files w/ extensions
 *
 !*/
 !*.*
+# re-ignore my 'xecutables
+*.x
