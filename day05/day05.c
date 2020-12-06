@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int * seatIds;
 int lines = 0;
@@ -60,6 +61,8 @@ int mySeatId(int highestSeatId) {
 }
 
 int main(int argc, char ** args) {
+    clock_t startTime = clock(), endTime;
+
     // read the input file
     FILE * file = fopen("input.txt", "r");
     if (file == NULL) { printf("Could not open input file."); return 1; }
@@ -98,4 +101,9 @@ int main(int argc, char ** args) {
 
     free(seatsTaken);
     free(seatIds);
+
+    endTime = clock();
+    double totalTime = (double)(endTime - startTime) / CLOCKS_PER_SEC;
+    printf("Elapsed time: %f milliseconds\n", totalTime * 1000.0);
+    printf("Elapsed time: %f microseconds\n", totalTime * 1000000.0);
 }
