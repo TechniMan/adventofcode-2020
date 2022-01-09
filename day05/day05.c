@@ -14,13 +14,8 @@ int seatIdForBoardingPass(char * boardingPass) {
     int base = 0, range = rowSize, row = 0, column = 0;
     // iter through the first 7 chars of the pass
     for (int c = 0; c < 7; c++) {
-        if (boardingPass[c] == 'F') {
-            range /= 2;
-        }
-        else if (boardingPass[c] == 'B') {
-            range /= 2;
-            base += range;
-        }
+        range /= 2;
+        base += (boardingPass[c] == 'B')* range;
     }
     row = base;
 
@@ -28,13 +23,8 @@ int seatIdForBoardingPass(char * boardingPass) {
     base = 0, range = colSize;
     // iter through the last 3 chars of the pass
     for (int c = 7; c < 10; c++) {
-        if (boardingPass[c] == 'L') {
-            range /= 2;
-        }
-        else if (boardingPass[c] == 'R') {
-            range /= 2;
-            base += range;
-        }
+        range /= 2;
+        base += (boardingPass[c] == 'R') * range;
     }
     column = base;
 
@@ -43,7 +33,7 @@ int seatIdForBoardingPass(char * boardingPass) {
 
 // fill up the seatsTaken array with whether or not that id of seat has been taken
 void sortSeats(int highestSeatId) {
-    seatsTaken = (char *)calloc(highestSeatId, sizeof(char));
+    //seatsTaken = (char *)calloc(highestSeatId, sizeof(char));
     for (int s = 0; s < lines; s++) {
         seatsTaken[seatIds[s]] = 1;
     }
@@ -61,49 +51,62 @@ int mySeatId(int highestSeatId) {
 }
 
 int main(int argc, char ** args) {
-    clock_t startTime = clock(), endTime;
+    const char attempts = 10;
+    double * times = calloc(attempts, sizeof(double));
 
-    // read the input file
-    FILE * file = fopen("input.txt", "r");
-    if (file == NULL) { printf("Could not open input file."); return 1; }
+    for (char attempt = 0; attempt < attempts; attempt++) {
+        clock_t startTime = clock(), endTime;
 
-    // initialise the seatIds; there are 757 lines of input
-    seatIds = (int *)calloc(757, sizeof(int));
+        // read the input file
+        FILE * file = fopen("input.txt", "r");
 
-    // each boarding pass is 10 chars + \n
-    char * line = (char *)calloc(11, sizeof(char));
-    // fgets reads n - 1 chars (no idea why)
-    fgets(line, 12, file);
-    int l;
-    for (l = 0; !feof(file); l++, fgets(line, 12, file)) {
-        seatIds[l] = seatIdForBoardingPass(line);
-        //printf("l: %d, boardingPass: %s, seatId: %d\n", l, line, seatIds[l]);
+        // initialise the seatIds; there are 757 lines of input
+        seatIds = (int *)calloc(757, sizeof(int));
+        seatsTaken = (char *)calloc(806, sizeof(char));
 
-        // set up for next iter
-        free(line);
-        line = (char *)calloc(11, sizeof(char));
-    }
-    free(line);
-    lines = l;
-    fclose(file);
+        // each boarding pass is 10 chars + \n
+        char * line = (char *)calloc(11, sizeof(char));
+        // fgets reads n - 1 chars (no idea why)
+        fgets(line, 12, file);
+        int l;
+        for (l = 0; !feof(file); l++, fgets(line, 12, file)) {
+            seatIds[l] = seatIdForBoardingPass(line);
+            //printf("l: %d, boardingPass: %s, seatId: %d\n", l, line, seatIds[l]);
 
-    int highestSeatId = 0;
-    for (int s = 0; s < lines; s++) {
-        if (seatIds[s] > highestSeatId) {
-            highestSeatId = seatIds[s];
+            // set up for next iter
+            free(line);
+            line = (char *)calloc(11, sizeof(char));
         }
+        free(line);
+        lines = l;
+        fclose(file);
+
+        int highestSeatId = 0, h = 0;
+        for (int s = 0; s < lines; s++) {
+            // branchless if (seatIds[s] > highestSeatId)
+            if (seatIds[s] > highestSeatId) {
+                highestSeatId = seatIds[s];
+            }
+        }
+        h = highestSeatId;
+
+        sortSeats(highestSeatId);
+
+        printf("Part 1: %d\n", h);
+        printf("Part 2: %d\n", mySeatId(h));
+
+        free(seatsTaken);
+        free(seatIds);
+
+        endTime = clock();
+        double elapsedTime = ((double)(endTime - startTime) / CLOCKS_PER_SEC) * 1000000.0;
+        printf("Elapsed time: %f microseconds\n", elapsedTime);
+        times[attempt] = elapsedTime;
     }
 
-    sortSeats(highestSeatId);
-
-    printf("Part 1: %d\n", highestSeatId);
-    printf("Part 2: %d\n", mySeatId(highestSeatId));
-
-    free(seatsTaken);
-    free(seatIds);
-
-    endTime = clock();
-    double totalTime = (double)(endTime - startTime) / CLOCKS_PER_SEC;
-    printf("Elapsed time: %f milliseconds\n", totalTime * 1000.0);
-    printf("Elapsed time: %f microseconds\n", totalTime * 1000000.0);
+    double averageTime = 0.0;
+    for (int t = 0; t < attempts; t++) {
+        averageTime += (times[t] / attempts);
+    }
+    printf("Average elapsed time: %f microseconds\n", averageTime);
 }
